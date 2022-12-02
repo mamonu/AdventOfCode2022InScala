@@ -1,2 +1,8 @@
 *.class
 *.log
+
+.metals/
+.DS_Store
+inputs/
+
+
