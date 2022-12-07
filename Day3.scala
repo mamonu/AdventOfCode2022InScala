@@ -4,7 +4,6 @@ import scala.collection.immutable._
 import scala.io.Codec
 import scala.collection.immutable.HashSet
 
-//notworkingyet
 
 object day3
 {
