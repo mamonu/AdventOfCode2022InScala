@@ -1,18 +1,30 @@
 import scala.io.Source
+import scala.collection.immutable._
+
 
 object day1
 {
 
 def main(args:Array[String]):Unit ={
-
 val inputFile = Source.fromFile("inputs/01-input.txt")
-val cals = inputFile.getLines().filter(_.nonEmpty).map(_.split("\n")).filter(_.nonEmpty).map(_.map(_.toInt))
-val totalCals = cals.map(_.sum)
 
-// Q1
-println(totalCals.max)
+def loadInput(inputText: String): List[List[Int]] = {
+  inputText.split("\n\n").map(_.split("\n").map(_.toInt).toList).toList
+}
 
-// Q2
-println(totalCals.toList.sorted(Ordering[Int].reverse).take(3).sum)
+
+def part1(cals: List[List[Int]]): Int = {
+  cals.map(c => c.sum).max
+}
+
+def part2(cals: List[List[Int]]): Int = {
+  cals.map(c => c.sum).sorted.takeRight(3).sum
+}
+
+val cals = loadInput(inputFile.mkString.trim)
+
+println(part1(cals))
+println(part2(cals))
+
     }
 }
