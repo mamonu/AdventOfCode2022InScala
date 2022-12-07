@@ -41,10 +41,10 @@ val part1Result = rucksacks
 
 val part2Result = rucksacks
   .sliding(3, 3)
-  .map(triple => {
-    val rucksack1 = triple(0)
-    val rucksack2 = triple(1)
-    val rucksack3 = triple(2)
+  .map(triplet => {
+    val rucksack1 = triplet(0)
+    val rucksack2 = triplet(1)
+    val rucksack3 = triplet(2)
     rucksack1.intersect(rucksack2).filter(rucksack3.contains(_)).headOption.getOrElse('!')
   })
   .map(priority _) 
