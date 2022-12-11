@@ -1,54 +1,57 @@
 import scala.util.matching.Regex
 import scala.collection.mutable.ListBuffer
+import scala.collection.Seq
+import scala.io.Source
+import scala.collection.immutable._
 
-//notworkingyet
-object day1
-{
+
+object day5 {
 
 def main(args:Array[String]):Unit ={
 
 
+val inputFile = Source.fromFile("inputs/05-input.txt").mkString
 
+val move = """move (\d+) from (\d+) to (\d+)""".r
 
-// Read inputs from file
-val input = scala.io.Source.fromFile("inputs/05-input.txt").getLines.mkString("\n")
-val Array(stack, inst) = input.split("\n\n")
-
-// Sort stack out
-val stackRegex = new Regex("\\[|\\]")
-val stackRegex2 = new Regex("(?<=\\w) ")
-val stackCleaned = stackRegex.replaceAllIn(stack, "")
-val stackCleaned2 = stackRegex2.replaceAllIn(stackCleaned, ",")
-val stackLines = stackCleaned2.split("\n").reverse
-val stackParsed = stackLines.map(_.split(",").filter(_.nonEmpty)).map(_.toList).to[ListBuffer]
-
-// Parse instructions ([n, src, dst])
-val instRegex = new Regex("\\d+")
-val instParsed = inst.split("\n").map { line =>
-  instRegex.findAllIn(line).map(_.toInt).toList
+def stacks(input: String): Map[Int, List[Char]] = {
+  val lines = input.split("\n").toList.takeWhile(_.contains("["))
+  val transposed = Seq(lines: _*).transpose.filter(_.exists(x => x >= 'A' && x <= 'Z'))
+  val filtered = transposed.map(_.filter(_ != ' '))
+  val zipped = filtered.zipWithIndex
+  val mapped = zipped.map { case (stack: List[Char], index) => (index + 1, stack) }
+  mapped.toList.toMap
 }
 
-// Function to rearrange stacks
-def rearrange(arrangement: ListBuffer[List[String]], instruction: List[Int], crane: Int = 9000): ListBuffer[List[String]] = {
-  val List(n, src, dst) = instruction
-  val srcStack = arrangement(src - 1)
-  val dstStack = arrangement(dst - 1)
-  if (crane == 9000) {
-    arrangement(dst - 1) = dstStack ++ srcStack.slice(srcStack.length - n - 1, srcStack.length)
-  } else if (crane == 9001) {
-    arrangement(dst - 1) = dstStack ++ srcStack.slice(srcStack.length - n, srcStack.length)
+def moves(input: String): Array[String] =
+  input.split("\n").dropWhile(!_.contains("move"))
+
+def endStacks(input: String, reverse: Boolean): Map[Int, List[Char]] = {
+  val initial = stacks(input)
+  moves(input).foldLeft(initial) {
+    case (stacks, move(count, from, to)) =>
+      val fromStack = stacks(from.toInt)
+      val toStack = stacks(to.toInt)
+      val moved = fromStack.take(count.toInt)
+      val newFrom = fromStack.drop(count.toInt)
+      val newTo = if (reverse) moved.reverse ++ toStack else moved ++ toStack
+      stacks + (from.toInt -> newFrom) + (to.toInt -> newTo)
   }
-  arrangement(src - 1) = srcStack.slice(0, srcStack.length - n)
-  arrangement
 }
 
-// Solution
-val result = instParsed.foldLeft(stackParsed) { (acc, instruction) =>
-  rearrange(acc, instruction, 9001)
+
+def part1(input: String): String = {
+  val stacks = endStacks(input, true)
+  stacks.toList.sortBy(_._1).map(_._2.head).mkString
 }
 
-println("Result: " + result.map(_.last).mkString)
+def part2(input: String): String = {
+  val stacks = endStacks(input, false)
+  stacks.toList.sortBy(_._1).map(_._2.head).mkString
+}
 
+ println(part1(inputFile))
+ println(part2(inputFile))
 
 }
 }
