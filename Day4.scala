@@ -1,42 +1,32 @@
-
 import scala.io.Source
-import scala.collection.immutable._
+import scala.collection.immutable.{Seq, List}
 
-//notworkingyet
+// Not yet working :grimace:
 
 object day4
 {
+  def main(args:Array[String]):Unit ={
+    val inputFile = Source.fromFile("inputs/04-input.txt").getLines().to[scala.collection.immutable.Seq]
 
-def main(args:Array[String]):Unit ={
-val inputFile = Source.fromFile("inputs/04-input.txt")
-
-
-def part1(pairs: List[(Set[Int], Set[Int])]) : Int = {
-  pairs.map(pair => if (pair._1.subsetOf(pair._2) || pair._2.subsetOf(pair._1)) 1 else 0).sum
+def parse(input: String): (Seq[Int], Seq[Int]) = {
+  val first = input.split(',').toList.map {
+    case s"${lo}-${hi}" => lo.toInt to hi.toInt
+  }.head
+  val second = input.split(',').toList.map {
+    case s"${lo}-${hi}" => lo.toInt to hi.toInt
+  }.tail.head
+  (first, second)
 }
 
-def part2(pairs: List[(Set[Int], Set[Int])]) : Int = {
-  pairs.map(pair => if (pair._1.intersect(pair._2).nonEmpty) 1 else 0).sum
-}
+    def part1(input: Seq[String]): Int = input
+      .map(parse)
+      .count(x => x._1.containsSlice(x._2) || x._2.containsSlice(x._1))
 
-def loadInput(inputText: String) : List[(Set[Int], Set[Int])] = {
-  inputText.split("\n").toList.map(row =>
-    row.split(",").map(col => {
-      val numbers = col.split("-").map(_.toInt)
-      Set(numbers:_*)
-    }).toList
-  ).map(row => (row(0), row(1)))
-}
+    def part2(input: Seq[String]): Int = input
+      .map(parse)
+      .count(x => x._1.intersect(x._2).nonEmpty)
 
-
-
-val pairs = loadInput(inputFile.mkString)
-
-
-println(part1(pairs))
-println(part2(pairs))
-
-
-
-}
+    println(part1(inputFile))
+    println(part2(inputFile))
+  }
 }
