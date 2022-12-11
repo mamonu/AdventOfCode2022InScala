@@ -1,7 +1,8 @@
 import scala.io.Source
 import scala.collection.immutable.{Seq, List}
+import scala.util.matching.Regex
 
-// Not yet working :grimace:
+// :grimace:  
 
 object day4
 {
@@ -9,14 +10,17 @@ object day4
     val inputFile = Source.fromFile("inputs/04-input.txt").getLines().to[scala.collection.immutable.Seq]
 
 def parse(input: String): (Seq[Int], Seq[Int]) = {
-  val first = input.split(',').toList.map {
-    case s"${lo}-${hi}" => lo.toInt to hi.toInt
-  }.head
-  val second = input.split(',').toList.map {
-    case s"${lo}-${hi}" => lo.toInt to hi.toInt
-  }.tail.head
-  (first, second)
-}
+    val pattern = "([0-9]+)-([0-9]+)"
+    val regex = new Regex(pattern)
+    val (first, second) = regex.findAllMatchIn(input).map { m =>
+      m.group(1).toInt to m.group(2).toInt
+    }.toList match {
+      case first :: second :: Nil => (first, second)
+      case _ => throw new IllegalArgumentException("Invalid input format")
+    }
+    (first, second)
+  }
+
 
     def part1(input: Seq[String]): Int = input
       .map(parse)
